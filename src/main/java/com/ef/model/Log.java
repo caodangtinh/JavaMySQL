@@ -31,7 +31,7 @@ public class Log {
     }
 
 
-    public Log(DateTime date, String ip, String request, byte status, String userAgent) {
+    public Log(DateTime date, String ip, String request, short status, String userAgent) {
         this.date = date;
         this.ip = ip;
         this.request = request;
