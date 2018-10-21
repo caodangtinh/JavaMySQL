@@ -1,24 +1,48 @@
 package com.ef.converter;
 
 import com.ef.model.Log;
+import com.ef.repository.impl.LogRepositoryImpl;
+import com.ef.service.LogService;
 import com.ef.utils.Constant;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
+@Component
 public class FileProcessor {
+    private static final Logger LOGGER = Logger.getLogger(LogRepositoryImpl.class);
 
-    public static List<Log> processInputFile(String inputFilePath) {
-        Function<String, Log> mapToItem = (line) -> new Log(line.split(Constant.DELIMITER));
-        List<Log> inputList = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(inputFilePath))))) {
-            inputList = br.lines().map(mapToItem).collect(Collectors.toList());
+    @Autowired
+    private LogService logService;
+
+    public void processAndInsert(String inputFilePath) {
+        int count = 1;
+        try (BufferedReader br = new BufferedReader(new FileReader(inputFilePath))) {
+            List<Log> logs = new ArrayList<>();
+            for (String line; (line = br.readLine()) != null; ) {
+                logs.add(new Log(line.split(Constant.DELIMITER)));
+                if (logs.size() == 100) {
+                    LOGGER.info("Starting insert data for batch " + count + " with " + logs.size() + " records");
+                    logService.insertBatchLog(logs);
+                    LOGGER.info("Finished insert data for batch " + count + " with " + logs.size() + " records");
+                    logs.clear();
+                    count ++;
+                }
+            }
+
+            // last batch
+            if (logs.size() > 0) {
+                logService.insertBatchLog(logs);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return inputList;
+
     }
 }

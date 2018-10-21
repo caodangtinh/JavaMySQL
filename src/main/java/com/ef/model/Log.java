@@ -21,7 +21,7 @@ public class Log {
     }
 
     public Log(String[] logLine) {
-        this.setDate(Constant.DATE_TIME_FORMATTER.parseDateTime(logLine[0]));
+        this.setDate(Constant.LOG_DATE_TIME_FORMATTER.parseDateTime(logLine[0]));
         this.setIp(logLine[1]);
         // replace double quote from original value to avoid ""${value}""
         this.setRequest(Constant.DOUBLE_QUOTE.matcher(logLine[2]).replaceAll(""));
