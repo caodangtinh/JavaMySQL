@@ -40,9 +40,10 @@ public class Parser {
         // start date
         String startDateStr = map.get("--startDate");
         DateTime paramDate = INPUT_DATE_TIME_FORMATTER.parseDateTime(startDateStr);
-
-        DateTime startDate = LOG_DATE_TIME_FORMATTER.parseDateTime(paramDate.toString());
-        DateTime endDate = LOG_DATE_TIME_FORMATTER.parseDateTime(paramDate.toString());
+        // change format from "yyyy-MM-dd.HH:mm:ss" to "yyyy-MM-dd HH:mm:ss.SSS"
+        String inputDateTimeStr = LOG_DATE_TIME_FORMATTER.print(paramDate);
+        DateTime startDate = LOG_DATE_TIME_FORMATTER.parseDateTime(inputDateTimeStr);
+        DateTime endDate = LOG_DATE_TIME_FORMATTER.parseDateTime(inputDateTimeStr);
         // duration
         String duration = map.get("--duration");
         if (HOURLY.equals(duration)) {
