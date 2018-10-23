@@ -2,9 +2,10 @@ package com.ef;
 
 import com.ef.configuration.ApplicationConfiguration;
 import com.ef.converter.FileProcessor;
+import com.ef.repository.impl.LogRepositoryImpl;
 import com.ef.service.LogService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -19,7 +20,7 @@ import java.util.stream.Stream;
 import static com.ef.utils.Constant.*;
 
 public class Parser {
-    private final org.apache.commons.logging.Log logger = LogFactory.getLog(getClass());
+    private static final Logger LOGGER = Logger.getLogger(LogRepositoryImpl.class);
 
     public static void main(String[] args) {
         List<String> argsList = Arrays.asList(args);
@@ -35,6 +36,7 @@ public class Parser {
         // load data to MySQL if exist --accesslog parameter
         if (map.containsKey("--accesslog")) {
             fileProcessor.processAndInsert(map.get("--accesslog"));
+            LOGGER.info("Finished loading data");
         }
 
         // start date
@@ -60,6 +62,11 @@ public class Parser {
             throw new IllegalArgumentException("Invalid threshold");
         }
         List<String> ips = logService.findByPeriodAndThreshold(startDate, endDate, Integer.valueOf(threshold));
-        System.out.println(ips);
+        LOGGER.info("List matched IPs " + ips);
+        if (ips.size() > 0) {
+            LOGGER.info("Saving search data for " + ips.size() + " records");
+            logService.saveSearch(ips, "Search from " + startDate + " to " + endDate + " with threshold " + threshold);
+            LOGGER.info("Finished saving search data");
+        }
     }
 }

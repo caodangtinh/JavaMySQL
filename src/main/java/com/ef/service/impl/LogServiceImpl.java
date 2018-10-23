@@ -13,7 +13,6 @@ import java.util.List;
 @Service
 public class LogServiceImpl implements LogService {
 
-
     @Autowired
     private LogRepository logRepository;
 
@@ -25,5 +24,10 @@ public class LogServiceImpl implements LogService {
     @Override
     public List<String> findByPeriodAndThreshold(DateTime start, DateTime end, int threshold) {
         return logRepository.findByPeriodAndThreshold(start, end, threshold);
+    }
+
+    @Override
+    public void saveSearch(List<String> ips, String comment) {
+        logRepository.saveSearch(ips, comment);
     }
 }

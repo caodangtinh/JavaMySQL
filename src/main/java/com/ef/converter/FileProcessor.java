@@ -28,7 +28,6 @@ public class FileProcessor {
             for (String line; (line = br.readLine()) != null; ) {
                 logs.add(new Log(line.split(Constant.DELIMITER)));
                 if (logs.size() == 100) {
-                    LOGGER.info("Starting insert data for batch " + count + " with " + logs.size() + " records");
                     logService.insertBatchLog(logs);
                     LOGGER.info("Finished insert data for batch " + count + " with " + logs.size() + " records");
                     logs.clear();
@@ -41,7 +40,7 @@ public class FileProcessor {
                 logService.insertBatchLog(logs);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error while trying to parse " + e.getMessage());
         }
 
     }
